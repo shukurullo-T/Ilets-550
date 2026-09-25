@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The 550-Hour Ledger — IELTS 6.5</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;1,9..144,500&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="sheet">
+
+  <header>
+    <p class="kicker">Personal study ledger</p>
+    <h1>The 550-hour <em>ledger</em></h1>
+  </header>
+
+  <div class="hero">
+    <div>
+      <div class="hero-num" id="remainingNum">550<sup>hrs</sup></div>
+      <div class="hero-label" id="remainingLabel">nothing logged yet</div>
+    </div>
+    <div class="hero-side">
+      <span id="paceLabel">Recommended pace</span>
+      <strong id="paceNum">—</strong>
+    </div>
+  </div>
+
+  <section>
+    <h2>Allocation by skill</h2>
+    <div class="ledger" id="categoryLedger"></div>
+  </section>
+
+  <section>
+    <h2>Log today's session</h2>
+    <form id="logForm">
+      <div class="field-row">
+        <div>
+          <label for="catSelect">Skill</label>
+          <select id="catSelect"></select>
+        </div>
+        <div>
+          <label for="hoursInput">Hours</label>
+          <input type="text" inputmode="decimal" id="hoursInput" placeholder="2.5">
+        </div>
+        <div>
+          <label for="dateInput">Date</label>
+          <input type="date" id="dateInput">
+        </div>
+      </div>
+      <div class="note-field">
+        <label for="noteInput">Note (optional)</label>
+        <input type="text" id="noteInput" placeholder="e.g. Cambridge 15, Test 3">
+      </div>
+      <button type="button" id="addBtn">Add to ledger</button>
+    </form>
+  </section>
+
+  <section>
+    <h2>Session history</h2>
+    <div class="history" id="historyList"></div>
+  </section>
+
+  <footer>
+    <span id="planSpan">—</span>
+    <button class="reset" id="resetBtn" type="button">Clear ledger</button>
+  </footer>
+
+</div>
+
+<div id="errBox"></div>
+
+<script src="script.js"></script>
+</body>
+</html>
