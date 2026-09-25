@@ -74,6 +74,24 @@ header{
   letter-spacing: 0.01em;
   margin: 0 0 6px;
 }
+.header-top{
+  display:flex;
+  align-items:center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 6px;
+}
+.header-top .kicker{ margin: 0; min-width: 0; overflow-wrap: anywhere; }
+.logout-btn{
+  flex-shrink: 0;
+  background:none;
+  border: 1px solid var(--line);
+  color: var(--ink-soft);
+  font-weight: 500;
+  font-size: 12.5px;
+  padding: 6px 12px;
+}
+.logout-btn:hover{ color: var(--ink); border-color: var(--ink-soft); opacity:1; }
 h1{
   font-family: 'Fraunces', serif;
   font-weight: 500;
@@ -407,4 +425,3 @@ footer button.reset:hover{ color: var(--rust); border-color: var(--rust); opacit
   color: var(--ink-soft);
   margin: 4px 0 0;
 }
-.footer-actions{ display:flex; gap: 8px; }

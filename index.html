@@ -46,7 +46,10 @@
 <div class="sheet" id="app" hidden>
 
   <header>
-    <p class="kicker" id="whoLabel">Personal study ledger</p>
+    <div class="header-top">
+      <p class="kicker" id="whoLabel">Personal study ledger</p>
+      <button class="logout-btn" id="logoutBtn" type="button">Log out</button>
+    </div>
     <h1>The 550-hour <em>ledger</em></h1>
   </header>
 
@@ -98,10 +101,7 @@
 
   <footer>
     <span id="planSpan">—</span>
-    <span class="footer-actions">
-      <button class="reset" id="logoutBtn" type="button">Log out</button>
-      <button class="reset" id="resetBtn" type="button">Clear ledger</button>
-    </span>
+    <button class="reset" id="resetBtn" type="button">Clear ledger</button>
   </footer>
 
 </div>

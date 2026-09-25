@@ -172,7 +172,9 @@ try{
     });
   });
 
+  // Logging out also forgets the name, so the next visit asks for both again
   document.getElementById('logoutBtn').addEventListener('click', function(){
+    try { localStorage.removeItem(LAST_NAME_KEY); } catch(e){}
     location.reload();
   });
 
