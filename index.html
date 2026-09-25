@@ -7,10 +7,39 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;1,9..144,500&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="style.css?v=2">
 </head>
 <body>
-<div class="sheet">
+<div class="gate" id="gate">
+  <div class="gate-card">
+    <p class="kicker">Personal study ledger</p>
+    <h1>The 550-hour <em>ledger</em></h1>
+
+    <div class="gate-tabs" role="tablist">
+      <button type="button" class="gate-tab active" id="tabLogin" role="tab">Enter code</button>
+      <button type="button" class="gate-tab" id="tabCreate" role="tab">Create new code</button>
+    </div>
+
+    <form id="loginForm" class="gate-form" autocomplete="off">
+      <label for="loginCode">Your code</label>
+      <input type="password" id="loginCode" placeholder="••••" autocomplete="current-password">
+      <button type="submit">Enter</button>
+    </form>
+
+    <form id="createForm" class="gate-form" autocomplete="off" hidden>
+      <label for="newCode">New code (at least 4 characters)</label>
+      <input type="password" id="newCode" placeholder="••••" autocomplete="new-password">
+      <label for="newCode2">Repeat the code</label>
+      <input type="password" id="newCode2" placeholder="••••" autocomplete="new-password">
+      <button type="submit">Create and enter</button>
+    </form>
+
+    <p class="gate-msg" id="gateMsg" role="alert"></p>
+    <p class="gate-hint">No name needed. Remember your code — you will use it to open your ledger next time.</p>
+  </div>
+</div>
+
+<div class="sheet" id="app" hidden>
 
   <header>
     <p class="kicker">Personal study ledger</p>
@@ -65,13 +94,16 @@
 
   <footer>
     <span id="planSpan">—</span>
-    <button class="reset" id="resetBtn" type="button">Clear ledger</button>
+    <span class="footer-actions">
+      <button class="reset" id="logoutBtn" type="button">Log out</button>
+      <button class="reset" id="resetBtn" type="button">Clear ledger</button>
+    </span>
   </footer>
 
 </div>
 
 <div id="errBox"></div>
 
-<script src="script.js"></script>
+<script src="script.js?v=2"></script>
 </body>
 </html>

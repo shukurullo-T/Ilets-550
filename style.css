@@ -315,3 +315,61 @@ footer button.reset:hover{ color: var(--rust); border-color: var(--rust); opacit
   text-align:center;
   z-index:999;
 }
+
+/* ---------- Code gate (login) ---------- */
+[hidden]{ display:none !important; }
+.gate{
+  min-height: 100vh;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  padding: 32px 16px;
+}
+.gate-card{
+  width: 100%;
+  max-width: 380px;
+}
+.gate-card h1{ margin-bottom: 28px; }
+.gate-tabs{
+  display:flex;
+  border-bottom: 1px solid var(--line);
+  margin-bottom: 18px;
+}
+.gate-tab{
+  flex:1;
+  background:none;
+  color: var(--ink-soft);
+  font-weight: 500;
+  padding: 10px 6px;
+  border-bottom: 2px solid transparent;
+  margin-bottom: -1px;
+}
+.gate-tab.active{
+  color: var(--ink);
+  border-bottom-color: var(--accent);
+}
+.gate-form label{ margin-top: 12px; }
+.gate-form label:first-child{ margin-top: 0; }
+.gate-form input[type=password]{
+  width: 100%;
+  font-family: 'Inter', sans-serif;
+  font-size: 16px;
+  padding: 11px 10px;
+  background: var(--card-bg);
+  border: 1px solid var(--line);
+  color: var(--ink);
+  letter-spacing: 0.15em;
+}
+.gate-form button{ width:100%; margin-top: 16px; }
+.gate-msg{
+  min-height: 1.5em;
+  margin: 12px 0 0;
+  font-size: 13px;
+  color: var(--rust);
+}
+.gate-hint{
+  font-size: 12.5px;
+  color: var(--ink-soft);
+  margin: 4px 0 0;
+}
+.footer-actions{ display:flex; gap: 8px; }
