@@ -16,17 +16,18 @@ try{
 
   var LEGACY_STORE_KEY = 'ielts-ledger-entries-v1';
   var LEGACY_PLAN_KEY = 'ielts-ledger-planstart-v1';
-  var CODES_KEY = 'ielts-ledger-codes-v1';
+  var ACCOUNTS_KEY = 'ielts-ledger-accounts-v1';
+  var LAST_NAME_KEY = 'ielts-ledger-lastname-v1';
   var STORE_KEY, PLAN_KEY;
+  var started = false;
 
-  // ---------- Code gate ----------
-  // No name is asked for: the user picks a personal code once and uses it to
-  // enter next time. Only a hash of the code is stored, and each code gets its
-  // own ledger in localStorage.
-  function hashCode(code){
-    var salted = 'ielts-550:' + code;
+  // ---------- Name + code gate ----------
+  // The user signs up with just a name (no surname) and a personal code, and
+  // enters with the same pair next time. Only a hash of name + code is stored,
+  // and each account gets its own ledger in localStorage.
+  function sha256(text){
     if (window.crypto && crypto.subtle && window.TextEncoder){
-      return crypto.subtle.digest('SHA-256', new TextEncoder().encode(salted)).then(function(buf){
+      return crypto.subtle.digest('SHA-256', new TextEncoder().encode(text)).then(function(buf){
         return Array.prototype.map.call(new Uint8Array(buf), function(b){
           return ('0' + b.toString(16)).slice(-2);
         }).join('');
@@ -34,27 +35,37 @@ try{
     }
     // Fallback for browsers without SubtleCrypto
     var h = 5381;
-    for (var i = 0; i < salted.length; i++) h = ((h * 33) ^ salted.charCodeAt(i)) >>> 0;
+    for (var i = 0; i < text.length; i++) h = ((h * 33) ^ text.charCodeAt(i)) >>> 0;
     return Promise.resolve('f' + h.toString(16));
   }
-  function loadCodes(){
+  function accountId(nameKey, code){
+    return sha256('ielts-550:' + JSON.stringify([nameKey, code]));
+  }
+  function cleanName(name){ return name.trim().replace(/\s+/g, ' '); }
+  function loadAccounts(){
     try {
-      var parsed = JSON.parse(localStorage.getItem(CODES_KEY) || '[]');
+      var parsed = JSON.parse(localStorage.getItem(ACCOUNTS_KEY) || '[]');
       return Array.isArray(parsed) ? parsed : [];
     } catch(e){ return []; }
   }
-  function saveCodes(list){
-    try { localStorage.setItem(CODES_KEY, JSON.stringify(list)); return true; }
+  function saveAccounts(list){
+    try { localStorage.setItem(ACCOUNTS_KEY, JSON.stringify(list)); return true; }
     catch(e){ return false; }
   }
-  // Data logged before codes existed goes to the first code that is created.
-  function adoptLegacyData(userId){
+  function findAccount(list, key){
+    for (var i = 0; i < list.length; i++){
+      if (list[i] && list[i].key === key) return list[i];
+    }
+    return null;
+  }
+  // Data logged before accounts existed goes to the first account created.
+  function adoptLegacyData(id){
     try {
       [[LEGACY_STORE_KEY, 'ielts-ledger-entries-v1:'], [LEGACY_PLAN_KEY, 'ielts-ledger-planstart-v1:']]
         .forEach(function(pair){
           var raw = localStorage.getItem(pair[0]);
           if (raw !== null){
-            localStorage.setItem(pair[1] + userId, raw);
+            localStorage.setItem(pair[1] + id, raw);
             localStorage.removeItem(pair[0]);
           }
         });
@@ -67,6 +78,54 @@ try{
   var tabCreate = document.getElementById('tabCreate');
   var loginForm = document.getElementById('loginForm');
   var createForm = document.getElementById('createForm');
+  var loginName = document.getElementById('loginName');
+  var loginCode = document.getElementById('loginCode');
+  var newName = document.getElementById('newName');
+  var newCode = document.getElementById('newCode');
+  var newCode2 = document.getElementById('newCode2');
+
+  // Eye button in the corner of a code field: shows or hides what was typed,
+  // so the user can check the code before entering.
+  var EYE_ICONS =
+    '<svg class="eye-show" viewBox="0 0 24 24" aria-hidden="true"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>' +
+    '<svg class="eye-hide" viewBox="0 0 24 24" aria-hidden="true"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><path d="M1 1l22 22"/></svg>';
+  function addRevealToggle(input){
+    var wrap = document.createElement('div');
+    wrap.className = 'code-field';
+    input.parentNode.insertBefore(wrap, input);
+    wrap.appendChild(input);
+    var btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'code-eye';
+    btn.innerHTML = EYE_ICONS;
+    function sync(){
+      var shown = input.type === 'text';
+      btn.setAttribute('aria-pressed', shown ? 'true' : 'false');
+      btn.setAttribute('aria-label', shown ? 'Hide code' : 'Show code');
+      btn.title = shown ? 'Hide code' : 'Show code';
+    }
+    // Keep the cursor in the field when the eye is clicked
+    btn.addEventListener('mousedown', function(ev){ ev.preventDefault(); });
+    btn.addEventListener('click', function(){
+      var start = input.selectionStart, end = input.selectionEnd;
+      input.type = input.type === 'password' ? 'text' : 'password';
+      // Chrome sends the cursor to the start when it lays the field out again
+      // after a type switch, so force that layout now and then put it back
+      if (document.activeElement === input){
+        void input.offsetWidth;
+        try { input.setSelectionRange(start, end); } catch(e){}
+      }
+      sync();
+    });
+    sync();
+    wrap.appendChild(btn);
+  }
+  [loginCode, newCode, newCode2].forEach(addRevealToggle);
+
+  function fail(msg, field){
+    gateMsg.textContent = msg;
+    if (field) field.focus();
+  }
 
   function showTab(create){
     tabLogin.classList.toggle('active', !create);
@@ -74,40 +133,42 @@ try{
     loginForm.hidden = create;
     createForm.hidden = !create;
     gateMsg.textContent = '';
-    (create ? document.getElementById('newCode') : document.getElementById('loginCode')).focus();
+    if (create) newName.focus();
+    else (loginName.value ? loginCode : loginName).focus();
   }
   tabLogin.addEventListener('click', function(){ showTab(false); });
   tabCreate.addEventListener('click', function(){ showTab(true); });
 
   loginForm.addEventListener('submit', function(ev){
     ev.preventDefault();
-    var code = document.getElementById('loginCode').value;
-    if (!code){ gateMsg.textContent = 'Please enter your code.'; return; }
-    hashCode(code).then(function(userId){
-      if (loadCodes().indexOf(userId) === -1){
-        gateMsg.textContent = 'Wrong code. Check it, or create a new one.';
-        return;
-      }
-      startApp(userId);
+    var name = cleanName(loginName.value);
+    var code = loginCode.value;
+    if (!name) return fail('Please enter your name.', loginName);
+    if (!code) return fail('Please enter your code.', loginCode);
+    var acc = findAccount(loadAccounts(), name.toLowerCase());
+    if (!acc) return fail('No ledger with this name yet. Check the spelling, or create a new one.', loginName);
+    accountId(acc.key, code).then(function(id){
+      if (id !== acc.id) return fail('Wrong code. Tap the eye to see what you typed.', loginCode);
+      startApp(acc);
     });
   });
 
   createForm.addEventListener('submit', function(ev){
     ev.preventDefault();
-    var code = document.getElementById('newCode').value;
-    var code2 = document.getElementById('newCode2').value;
-    if (code.length < 4){ gateMsg.textContent = 'The code must be at least 4 characters.'; return; }
-    if (code !== code2){ gateMsg.textContent = 'The two codes do not match.'; return; }
-    hashCode(code).then(function(userId){
-      var codes = loadCodes();
-      if (codes.indexOf(userId) !== -1){
-        gateMsg.textContent = 'This code already exists — use "Enter code" instead.';
-        return;
-      }
-      if (codes.length === 0) adoptLegacyData(userId);
-      codes.push(userId);
-      if (!saveCodes(codes)){ gateMsg.textContent = 'Could not save the code in this browser.'; return; }
-      startApp(userId);
+    var name = cleanName(newName.value);
+    var code = newCode.value;
+    if (!name) return fail('Please enter your name.', newName);
+    if (code.length < 4) return fail('The code must be at least 4 characters.', newCode);
+    if (code !== newCode2.value) return fail('The two codes do not match. Tap the eye to check them.', newCode2);
+    var key = name.toLowerCase();
+    accountId(key, code).then(function(id){
+      var accounts = loadAccounts();
+      if (findAccount(accounts, key)) return fail('This name is already taken. Log in with it, or choose another name.', newName);
+      var acc = { key: key, name: name, id: id };
+      if (accounts.length === 0) adoptLegacyData(id);
+      accounts.push(acc);
+      if (!saveAccounts(accounts)) return fail('Could not save your account in this browser.');
+      startApp(acc);
     });
   });
 
@@ -115,11 +176,17 @@ try{
     location.reload();
   });
 
-  showTab(loadCodes().length === 0);
+  try { loginName.value = localStorage.getItem(LAST_NAME_KEY) || ''; } catch(e){}
+  showTab(loadAccounts().length === 0);
 
-  function startApp(userId){
-    STORE_KEY = 'ielts-ledger-entries-v1:' + userId;
-    PLAN_KEY = 'ielts-ledger-planstart-v1:' + userId;
+  function startApp(acc){
+    // Guard against a double-clicked Enter attaching every handler twice
+    if (started) return;
+    started = true;
+    try { localStorage.setItem(LAST_NAME_KEY, acc.name); } catch(e){}
+    STORE_KEY = 'ielts-ledger-entries-v1:' + acc.id;
+    PLAN_KEY = 'ielts-ledger-planstart-v1:' + acc.id;
+    document.getElementById('whoLabel').textContent = 'Personal study ledger · ' + acc.name;
     gate.hidden = true;
     document.getElementById('app').hidden = false;
 

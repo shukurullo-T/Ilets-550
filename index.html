@@ -16,17 +16,21 @@
     <h1>The 550-hour <em>ledger</em></h1>
 
     <div class="gate-tabs" role="tablist">
-      <button type="button" class="gate-tab active" id="tabLogin" role="tab">Enter code</button>
-      <button type="button" class="gate-tab" id="tabCreate" role="tab">Create new code</button>
+      <button type="button" class="gate-tab active" id="tabLogin" role="tab">Log in</button>
+      <button type="button" class="gate-tab" id="tabCreate" role="tab">Create new</button>
     </div>
 
-    <form id="loginForm" class="gate-form" autocomplete="off">
+    <form id="loginForm" class="gate-form">
+      <label for="loginName">Your name</label>
+      <input type="text" id="loginName" placeholder="e.g. Aziz" maxlength="40" autocomplete="username">
       <label for="loginCode">Your code</label>
       <input type="password" id="loginCode" placeholder="••••" autocomplete="current-password">
       <button type="submit">Enter</button>
     </form>
 
-    <form id="createForm" class="gate-form" autocomplete="off" hidden>
+    <form id="createForm" class="gate-form" hidden>
+      <label for="newName">Your name (no surname needed)</label>
+      <input type="text" id="newName" placeholder="e.g. Aziz" maxlength="40" autocomplete="username">
       <label for="newCode">New code (at least 4 characters)</label>
       <input type="password" id="newCode" placeholder="••••" autocomplete="new-password">
       <label for="newCode2">Repeat the code</label>
@@ -35,14 +39,14 @@
     </form>
 
     <p class="gate-msg" id="gateMsg" role="alert"></p>
-    <p class="gate-hint">No name needed. Remember your code — you will use it to open your ledger next time.</p>
+    <p class="gate-hint">Just your name and a code, no surname. Remember both: you will use them to open your ledger next time.</p>
   </div>
 </div>
 
 <div class="sheet" id="app" hidden>
 
   <header>
-    <p class="kicker">Personal study ledger</p>
+    <p class="kicker" id="whoLabel">Personal study ledger</p>
     <h1>The 550-hour <em>ledger</em></h1>
   </header>
 

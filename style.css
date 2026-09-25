@@ -350,17 +350,52 @@ footer button.reset:hover{ color: var(--rust); border-color: var(--rust); opacit
 }
 .gate-form label{ margin-top: 12px; }
 .gate-form label:first-child{ margin-top: 0; }
-.gate-form input[type=password]{
+/* Same look whether a code field is hidden (password) or shown (text) */
+.gate-form input{
   width: 100%;
   font-family: 'Inter', sans-serif;
   font-size: 16px;
   padding: 11px 10px;
-  background: var(--card-bg);
+  background: var(--paper);
   border: 1px solid var(--line);
   color: var(--ink);
-  letter-spacing: 0.15em;
 }
-.gate-form button{ width:100%; margin-top: 16px; }
+.gate-form input::-ms-reveal,
+.gate-form input::-ms-clear{ display:none; }
+.gate-form button[type=submit]{ width:100%; margin-top: 16px; }
+
+/* Eye button in the corner of a code field */
+.code-field{ position: relative; }
+.code-field input{
+  letter-spacing: 0.12em;
+  padding-right: 46px;
+}
+.code-eye{
+  position:absolute;
+  top:0; right:0; bottom:0;
+  width: 44px;
+  padding: 0;
+  background: none;
+  color: var(--ink-soft);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+}
+.code-eye:hover{ color: var(--ink); opacity: 1; }
+.code-eye:focus-visible{ outline-offset: -4px; }
+.code-eye svg{
+  width: 19px;
+  height: 19px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.code-eye .eye-hide{ display:none; }
+.code-eye[aria-pressed="true"] .eye-show{ display:none; }
+.code-eye[aria-pressed="true"] .eye-hide{ display:block; }
+.code-eye[aria-pressed="true"]{ color: var(--accent); }
 .gate-msg{
   min-height: 1.5em;
   margin: 12px 0 0;
